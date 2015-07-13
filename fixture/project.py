@@ -45,6 +45,15 @@ class ProjectHelper:
             wd = self.app.wd
             self.open_manage_proj_page()
             self.project_cache = []
+
+            ###############
+            # http://www.tutorialspoint.com/python/string_startswith.htm
+            # for i2 in wd.find_elements_by_xpath("//table[3]/tbody/tr/td[1]/a"):
+            #     if i2.get_attribute("href").startswith("http://localhost/mantisbt-1.2.19/manage_proj_edit_page.php?project_id="):
+            #         href = i2.get_attribute("href")
+            #         print(href)
+            ###############
+
             for i in wd.find_elements_by_css_selector('a[href^="manage_proj_edit_page.php?project_id="]'):
                 # id =
                 name = i.text
