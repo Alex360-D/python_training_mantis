@@ -3,7 +3,12 @@
     "baseUrl": "http://localhost/mantisbt-1.2.19/"
   },
   "webadmin": {
-  "username": "administrator",
-  "password": "root"
+    "username": "administrator",
+    "password": "root"
+  },
+  "ftp": {
+    "host": "localhost",
+    "username": "mantis",
+    "password": "mantis"
   }
 }
