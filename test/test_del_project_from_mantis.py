@@ -12,11 +12,11 @@ def test_del_project_from_mantis(app):
         app.project.create(project)
     old_projects = app.project.get_project_list()
     project = random.choice(old_projects)
-    app.project.delete_project_by_name(project.name)
+    app.project.delete_project_by_id(project.id)
     new_projects = app.project.get_project_list()
     assert len(old_projects) - 1 == len(new_projects)
     old_projects.remove(project)
-    assert sorted(old_projects, key=Project.key) == sorted(new_projects, key=Project.key)
+    assert sorted(old_projects, key=Project.id_or_max) == sorted(new_projects, key=Project.id_or_max)
 
 def random_string(prefix, maxlen):
     symbols = string.ascii_letters + string.digits + " "*5

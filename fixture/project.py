@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from model.project import Project
+import re
 
 class ProjectHelper:
 
@@ -45,29 +46,39 @@ class ProjectHelper:
             wd = self.app.wd
             self.open_manage_proj_page()
             self.project_cache = []
-
-            ###############
-            # http://www.tutorialspoint.com/python/string_startswith.htm
-            # for i2 in wd.find_elements_by_xpath("//table[3]/tbody/tr/td[1]/a"):
-            #     if i2.get_attribute("href").startswith("http://localhost/mantisbt-1.2.19/manage_proj_edit_page.php?project_id="):
-            #         href = i2.get_attribute("href")
-            #         print(href)
-            ###############
-
-            for i in wd.find_elements_by_css_selector('a[href^="manage_proj_edit_page.php?project_id="]'):
-                # id =
-                name = i.text
-                # description =
-                self.project_cache.append(Project(name = name))
+            index = 0
+            for i2 in wd.find_elements_by_xpath("//table[3]/tbody/tr/td[1]/a"):
+                name = i2.text
+                if "manage_proj_edit_page.php?project_id=" in i2.get_attribute("href"):
+                    href = i2.get_attribute("href")
+                    id = int(re.search("\d+$", href).group(0))
+                    description = wd.find_elements_by_xpath("//table[3]/tbody/tr/td[5]")[index].text
+                    self.project_cache.append(Project(id = id, name = name, description = description))
+                index += 1
         return list(self.project_cache)
 
     def delete_project_by_name(self, name):
         wd = self.app.wd
         self.open_manage_proj_page()
         wd.find_element_by_link_text("%s" % name).click()
-        # wd.find_element_by_css_selector('a[href="manage_proj_edit_page.php?project_id=%s"]' % id).click()
         wd.find_element_by_css_selector("input[value='Delete Project']").click()
+        text_page_confirm_delete = wd.find_element_by_css_selector("div[align='center']").text
+        confirm_str = "Are you sure you want to delete this project and all attached issue reports?"
+        if confirm_str in text_page_confirm_delete:
+            wd.find_element_by_css_selector("input[value='Delete Project']").click()
+        if not wd.current_url.endswith("/manage_proj_page.php"):
+            self.return_to_project_page()
+        self.project_cache = None
+
+    def delete_project_by_id(self, id):
+        wd = self.app.wd
+        self.open_manage_proj_page()
+        wd.find_element_by_css_selector('a[href="manage_proj_edit_page.php?project_id=%s"]' % id).click()
         wd.find_element_by_css_selector("input[value='Delete Project']").click()
+        text_page_confirm_delete = wd.find_element_by_css_selector("div[align='center']").text
+        confirm_str = "Are you sure you want to delete this project and all attached issue reports?"
+        if confirm_str in text_page_confirm_delete:
+            wd.find_element_by_css_selector("input[value='Delete Project']").click()
         if not wd.current_url.endswith("/manage_proj_page.php"):
             self.return_to_project_page()
         self.project_cache = None
